@@ -1,0 +1,89 @@
+---
+resources:
+  - name: multitool-git-repo
+    type: git
+    icon: github-circle
+    webhook_token: testhook
+    source:
+      uri: https://github.com/bobclarke/multitool.git
+      branch: master
+
+  - name: golang-1.11.x-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: golang
+      tag: 1.11-stretch
+
+  - name: golang-1.10.x-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: golang
+      tag: 1.10-stretch
+
+  - name: golang-1.9.x-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: golang
+      tag: 1.9-stretch
+
+task-config: &task-config
+  platform: linux
+  inputs:
+    - name: multitool-git-repo
+      path: /go/src/github.com/bobclarke/multitool
+  run:
+    path: /bin/sh
+    args:
+      - -c
+      - |
+        SRCPATH=$PWD/go/src/github.com/bobclarke/multitool
+        GOPATH=$PWD/go
+        cd $SRCPATH
+        go get -t -v ./...
+        go test -v
+  
+
+jobs:
+  - name: golang-1.9
+    public: true
+    plan:
+      - get: multitool-git-repo
+        trigger: true
+      - get: golang-1.9.x-image
+        trigger: true
+      - task: run-tests
+        image: golang-1.9.x-image
+        config:
+          << : *task-config
+
+  - name: golang-1.10
+    public: true
+    plan: 
+      - get: multitool-git-repo
+        trigger: true
+        passed: [golang-1.9]
+      - get: golang-1.10.x-image
+        trigger: true
+      - task: run-tests
+        image: golang-1.10.x-image
+        config:
+          inputs: some-files
+          << : *task-config
+
+  - name: golang-1.11
+    public: true
+    plan: 
+      - get: multitool-git-repo
+        trigger: true
+        passed: [golang-1.9]
+      - get: golang-1.11.x-image
+        trigger: true
+      - task: run-tests
+        image: golang-1.11.x-image
+        config:
+          outputs:
+          - name: some-files
+          << : *task-config
