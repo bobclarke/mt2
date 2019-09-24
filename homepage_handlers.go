@@ -5,5 +5,5 @@ import (
 )
 
 func homepage(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "/assets/", http.StatusFound)
+	http.Redirect(w, r, assetsDir, http.StatusFound)
 }

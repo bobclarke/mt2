@@ -1,16 +1,19 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 )
 
-func TestConnect(t *testing.T) {
+func TestPostgresConnectHandler(t *testing.T) {
 
 	// Set up some test data - two ways of doing this
 	d := Database{}
-	d.connected = true
+	fmt.Println(d)
 
 	// Get a router instance
 	r := getRouter()
@@ -36,16 +39,20 @@ func TestConnect(t *testing.T) {
 		t.Errorf("Problem with Content-Type header, expected %s, got %s", expected, actual)
 	}
 
-	// Check the response body make make sure it contains our test data
-	/*
-		expectedRespBody, _ := json.Marshal(testBird) // Convert from type Bird to JSON
-		actualRespBody, _ := ioutil.ReadAll(resp.Body)
-		resp.Body.Close()
-		x := actualRespBody[:len(actualRespBody)-1]
-		trimmedRespBody := x[1:]
+	// Let's post data and verify that this updates the Database struct accordingly
+	form := connectForm()
+	requestBody := form.Encode()
+	postResp, _ := http.Post(mockServer.URL+"/connect", "application/x-www-form-urlencoded", bytes.NewBufferString(requestBody))
 
-		if string(expectedRespBody) != string(trimmedRespBody) {
-			t.Errorf("Expected response of: %s, got %s", expectedRespBody, trimmedRespBody)
-		}
-	*/
+	fmt.Println(postResp)
+
+}
+
+func connectForm() *url.Values {
+	form := url.Values{}
+	form.Set("host", "jupiter")
+	form.Set("port", "1234")
+	form.Set("user", "postgres")
+	form.Set("port", "p0stgres")
+	return &form
 }

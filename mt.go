@@ -12,6 +12,7 @@ func main() {
 	// Get a router instance and start our HTTP server
 	r := getRouter()
 	http.ListenAndServe("127.0.0.1:8000", r)
+
 }
 
 func getRouter() *mux.Router {
@@ -19,7 +20,8 @@ func getRouter() *mux.Router {
 	r := mux.NewRouter()
 
 	// Assign handlers
-	r.HandleFunc("/connect", connect).Methods("GET")
+	r.HandleFunc("/connect", connect).Methods("POST")
+	r.HandleFunc("/read", read).Methods("GET")
 	r.HandleFunc("/", homepage).Methods("GET")
 
 	// Static content handler (i.e for stuff in /assets/)

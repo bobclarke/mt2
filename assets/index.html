@@ -2,77 +2,38 @@
 <html lang="en">
 
 <head>
- <title>The bird encyclopedia</title>
+ <title>MT2 Connection Tester</title>
 </head>
 
 <body>
-  <h1>The bird encyclopedia</h1>
-  <!--
-    This section of the document specifies the table that will
-    be used to display the list of birds and their description
-   -->
-  <table>
-    <tr>
-      <th>Species</th>
-      <th>Description</th>
-    </tr>
-    <td>Dummy TD</td>
-    <td>Dummy TD</td>
-    </tr>
-  </table>
-  <br/>
+  <h1>MT2 Connection Tester</h1>
 
-  <!--
-    This section contains the form, that will be used to hit the
-    `POST /bird` API that we will build in the next section
-   -->
-  <form action="/bird" method="post">
-    Species:
-    <input type="text" name="species">
-    <br/> Description:
-    <input type="text" name="description">
-    <br/>
-    <input type="submit" value="Submit">
+  <form id="pg_form" action="/connect" method="POST">
+    <input type="text" name="host" value="jupiter"/><br/>
+    <input type="text" name="port" value="4000"/><br/>
+    <input type="text" name="user" value="admin"/><br/>
+    <input type="text" name="password" value="admin123"/><br/>
+    <input type="submit" name="connect" value="connect"/>
   </form>
 
-  <!--
-    Finally, the last section is the script that will
-    run on each page load to fetch the list of birds
-    and add them to our existing table
-   -->
+  <div id="postgres_results"></div>
+
   <script>
-    birdTable = document.querySelector("table")
+    var results = document.getElementById("postgres_results")
 
-    /*
-    Use the browsers `fetch` API to make a GET call to /bird
-    We expect the response to be a JSON list of birds, of the
-    form :
-    [
-      {"species":"...","description":"..."},
-      {"species":"...","description":"..."}
-    ]
-    */
-    fetch("/bird")
-      .then(response => response.json())
-      .then(birdList => {
-        //Once we fetch the list, we iterate over it
-        birdList.forEach(bird => {
-          // Create the table row
-          row = document.createElement("tr")
-
-          // Create the table data elements for the species and
-					// description columns
-          species = document.createElement("td")
-          species.innerHTML = bird.Species
-          description = document.createElement("td")
-          description.innerHTML = bird.Description
-
-          // Add the data elements to the row
-          row.appendChild(species)
-          row.appendChild(description)
-          // Finally, add the row element to the table itself
-          birdTable.appendChild(row)
-        })
-      })
+    fetch("/read")
+    .then(response => response.json())
+    .then(data => {
+      data.array.forEach(element => {
+        results.innerText += element
+      });
+    })
   </script>
+
+
+
+
+
 </body>
+
+</html>

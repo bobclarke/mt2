@@ -1,31 +1,47 @@
 package main
 
 import (
+	_ "database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
+
+	_ "github.com/lib/pq"
 )
 
 // Database struct represents our database
 type Database struct {
-	Host      string
-	Port      int64
-	User      string
-	Password  string
-	Connected bool
-	Databases []string
+	DBHost       string
+	DBPort       string
+	DBLogin      string
+	DBPassword   string
+	DBName       string
+	DBConnection []string
+	DBTables     []string
 }
+
+var d = &Database{}
 
 func connect(w http.ResponseWriter, r *http.Request) {
 
-	// Get a pointer to the Database struct
-	d := &Database{}
+	//fmt.Printf("Method is: %s \n", r.Method)
+	r.ParseForm()
+	d.DBHost = r.Form.Get("host")
+	d.DBPort = r.Form.Get("port")
+	d.DBLogin = r.Form.Get("user")
+	d.DBPassword = r.Form.Get("password")
 
-	// Update the connected status of our database
-	d.Connected = true
+	http.Redirect(w, r, "/assets/", http.StatusFound)
+}
 
-	// Generate a JSON version of our Database struct
+func read(w http.ResponseWriter, r *http.Request) {
 	dBytes, _ := json.Marshal(d)
-
-	// Write the json to via our ResponseWriter
 	w.Write(dBytes)
+}
+
+func (d Database) getMovies() []string {
+
+	movies := []string{"A Good Year", "The Matrix", "The Hangover"}
+	fmt.Printf("Movies: %v", movies)
+	return movies
 }
